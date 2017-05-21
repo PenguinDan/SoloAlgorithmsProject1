@@ -1,0 +1,63 @@
+package cecs328assi2;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
+/**
+ *
+ * @author Daniel Kim
+ */
+public class CombTest {
+
+    private ArrayList<Integer> storeNumbers;
+    private ArrayList<Integer> sortedList;
+    private ArrayList<Integer> smallestCons;
+    private int arraySize;
+
+    public CombTest() {
+        storeNumbers = new ArrayList<Integer>();
+        sortedList = new ArrayList<Integer>();
+        smallestCons = new ArrayList<Integer>();
+        arraySize = 0;
+    }
+
+    public void addNumber(int num) {
+        storeNumbers.add(num);
+        sortedList.add(num);
+        arraySize++;
+
+        if (arraySize > 1 && num < sortedList.get(arraySize - 2)) {
+            Collections.sort(sortedList);
+        }
+
+    }
+
+    public int getLowestNum() {
+        return sortedList.get(0);
+    }
+
+    public int getHighestNum() {
+        return sortedList.get(arraySize - 1);
+    }
+
+    public int getLowestConsec() {
+        return smallestCons.get(0);
+    }
+
+    public boolean hasConsec() {
+        return smallestCons.size() >= 1;
+    }
+
+    public int getNumber(int num) {
+        return sortedList.get(num);
+    }
+
+    public int consecCount() {
+        return smallestCons.size();
+    }
+
+    public int size() {
+        return arraySize;
+    }
+
+}
