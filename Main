@@ -1,0 +1,359 @@
+package cecs328assi2;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Scanner;
+
+/**
+ *
+ * @author Daniel Kim
+ */
+public class Cecs328Assi2 {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) throws FileNotFoundException {
+        Scanner readInput = new Scanner(new File("dolls.txt"));
+        ArrayList<NumberGroup> listOfGroups = new ArrayList<>();
+
+        int numberToInput = 0;
+
+        while (readInput.hasNextLine()) {
+            numberToInput = Integer.parseInt(readInput.nextLine());
+            if (numberToInput == 1) {
+                listOfGroups.add(new NumberGroup());
+            }
+        }
+        readInput.close();
+
+        Scanner readInput2 = new Scanner(new File("dolls.txt"));
+        ArrayList<Integer> neededNumbers = new ArrayList<Integer>();
+        ArrayList<Integer> storeToAdd = new ArrayList<Integer>();
+        int highestNumber;
+        final int MIN_IT = 3;
+
+        for (int i = 0; i < listOfGroups.size(); i++) {
+            NumberGroup currGroup = listOfGroups.get(i);
+            highestNumber = 0;
+
+            while (!storeToAdd.isEmpty()) {
+                numberToInput = storeToAdd.remove(0);
+                if (neededNumbers.contains(numberToInput)) {
+                    neededNumbers.remove((Integer) numberToInput);
+                }
+                if (numberToInput == 1) {
+                    currGroup.addNumber(numberToInput);
+                    continue;
+                }
+                if (!currGroup.contains(numberToInput - 1)) {
+                    neededNumbers.add(numberToInput - 1);
+                }
+                if (numberToInput > highestNumber) {
+                    highestNumber = numberToInput;
+                }
+                currGroup.addNumber(numberToInput);
+            }
+
+            if (i == listOfGroups.size() - 1) {
+                while (readInput2.hasNextLine()) {
+                    numberToInput = Integer.parseInt(readInput2.nextLine());
+                    currGroup.addNumber(numberToInput);
+                }
+                break;
+            }
+
+            while (true) {
+                if (currGroup.size() < MIN_IT) {
+                    for (int j = currGroup.size(); j < MIN_IT; j++) {
+                        numberToInput = Integer.parseInt(readInput2.nextLine());
+                        if (neededNumbers.contains(numberToInput)) {
+                            neededNumbers.remove((Integer) numberToInput);
+                        }
+                        if (numberToInput == 1) {
+                            currGroup.addNumber(numberToInput);
+                            continue;
+                        }
+                        if (!currGroup.contains(numberToInput - 1)) {
+                            neededNumbers.add(numberToInput - 1);
+                        }
+                        if (numberToInput > highestNumber) {
+                            highestNumber = numberToInput;
+                        }
+                        currGroup.addNumber(numberToInput);
+                    }
+                }
+                if (neededNumbers.isEmpty()) {
+                    while (true) {
+                        numberToInput = Integer.parseInt(readInput2.nextLine());
+
+                        if (numberToInput == highestNumber + 1) {
+                            for (int k = 0; k < storeToAdd.size(); k++) {
+                                int numToAdd = storeToAdd.remove(0);
+                                if (numToAdd > highestNumber) {
+                                    highestNumber = numToAdd;
+                                }
+                                currGroup.addNumber(numToAdd);
+                            }
+                            currGroup.addNumber(numberToInput);
+                        } else {
+                            storeToAdd.add(numberToInput);
+                            if (numberToInput <= highestNumber) {
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                } else {
+                    numberToInput = Integer.parseInt(readInput2.nextLine());
+                    currGroup.addNumber(numberToInput);
+                    if (neededNumbers.contains(numberToInput)) {
+                        neededNumbers.remove((Integer) numberToInput);
+                    }
+                    if (numberToInput == 1) {
+                        continue;
+                    }
+                    if (!currGroup.contains(numberToInput - 1)) {
+                        neededNumbers.add(numberToInput - 1);
+                    }
+                    if (numberToInput > highestNumber) {
+                        highestNumber = numberToInput;
+                    }
+                }
+            }
+        }
+
+        readInput2.close();
+
+        //-------------------------------------------------------------------------
+        for (int i = 0; i < listOfGroups.size(); i++) {
+            listOfGroups.get(i).initializeGroupStor();
+            listOfGroups.get(i).initializeAnswer();
+        }
+        //-----------------------------------------------------------------------------------------------------
+        //Debugging Purposes
+//        for (int i = 0; i < listOfGroups.size(); i++) {
+//            System.out.println(listOfGroups.get(i).toString());
+//            System.out.println(listOfGroups.get(i).printAnswer() + '\n');
+//        }
+
+        /*
+        //Prints the left solved string and the right unsolved string
+        System.out.println(listOfGroups.get(2).printLeftString() + listOfGroups.get(0).printRightString());
+         */
+        //-----------------------------------------------------------------------------------------------------
+        //solve and check for minimum openings
+        for (int i = 0; i < listOfGroups.size(); i++) {
+            recurseAux(listOfGroups.get(i), 0, listOfGroups.get(i).size() - 1);
+        }
+
+        for (int i = 0; i < listOfGroups.size(); i++) {
+            for (int j = 0; j < listOfGroups.size(); j++) {
+                if (j < i) {
+                    listOfGroups.get(i).addLeftSolved(listOfGroups.get(j).printAnswer());
+                }
+                if (j > i) {
+                    listOfGroups.get(i).addRightUnsolved(listOfGroups.get(j).printUnsolved());
+                }
+            }
+        }
+
+        for (int i = 0; i < listOfGroups.size(); i++) {
+            getSteps(listOfGroups.get(i), 0, listOfGroups.get(i).size() - 1);
+        }
+
+        //-----------------------------------------------------------------------------------------
+        //Debugging Purposes
+//        NumberGroup currGroup = listOfGroups.get(4);
+//        int startPoint = 0, endPoint = 0;
+//        for (int i = currGroup.getStartEndPointSize() - 1; i >= 0; i--) {
+//            startPoint = currGroup.getStartPoint(i);
+//            endPoint = currGroup.getEndPoint(i);
+//            System.out.println(startPoint + "," + endPoint);
+//            System.out.println(currGroup.getBestCaseString(startPoint, endPoint));
+//        }
+//---------------------------------------------------------------------------------------------------
+        for (int i = 0; i < listOfGroups.size(); i++) {
+            NumberGroup currGroup = listOfGroups.get(i);
+            int currGroupSize = currGroup.size();
+            String[][] storeCuts = new String[currGroupSize][currGroupSize];
+            int start = 0, end = 0;
+            String toAdd = currGroup.printUnsolved();
+            if (i == 0) {
+                currGroup.addInstruction(toAdd + " ");
+            }
+
+            for (int j = currGroup.getStartEndPointSize() - 1; j >= 0; j--) {
+                start = currGroup.getStartPoint(j);
+                end = currGroup.getEndPoint(j);
+
+                toAdd = currGroup.getBestCaseString(start, end) + " ";
+
+                if (end == currGroupSize - 1) {
+                    String toStore = currGroup.getUneditedBestCut(start, end);
+                    storeCuts[start][end] = toStore;
+                    currGroup.addInstruction(toAdd);
+                    continue;
+                }
+                String toEdit = "";
+
+                for (int k = 1; end + k < currGroupSize; k++) {
+                    if (storeCuts[end + k][currGroupSize - 1] == null) {
+                        if (end + k != currGroupSize - 1) {
+                            toEdit += currGroup.get(end + k) + " ";
+                        } else {
+                            toEdit += currGroup.get(end + k);
+                        }
+                    } else {
+                        toEdit += storeCuts[end + k][currGroupSize - 1];
+                        break;
+                    }
+                }
+
+                storeCuts[start][currGroupSize - 1] = currGroup.getUneditedBestCut(start, end)
+                        + " " + toEdit;
+
+                toAdd += toEdit + " ";
+                currGroup.addInstruction(toAdd);
+            }
+
+        }
+
+        PrintWriter output = new PrintWriter("instructions.txt");
+        for (int i = 0; i < listOfGroups.size(); i++) {
+            listOfGroups.get(i).printInstruction(output);
+        }
+        output.close();
+    }
+
+    public static void getSteps(NumberGroup array, int startPoint, int endPoint) {
+        if (startPoint == endPoint) {
+            return;
+        }
+        array.addStartPoints(startPoint);
+        array.addEndPoints(endPoint);
+
+        int cutPoint = array.getBestCut(startPoint, endPoint);
+
+        getSteps(array, startPoint, cutPoint);
+        getSteps(array, cutPoint + 1, endPoint);
+    }
+
+    public static int recurseAux(NumberGroup array, int startPoint, int endPoint) {
+        if (array.checkStoredValue(startPoint, endPoint) != -1) {
+            return array.checkStoredValue(startPoint, endPoint);
+        }
+        if (startPoint == endPoint) {
+            array.storeValue(startPoint, endPoint, 0);
+            array.storeBestCut(startPoint, endPoint, 0);
+            array.storeBestCutString(startPoint, endPoint, array.get(startPoint) + "");
+            return 0;
+        }
+        if (startPoint + 1 == endPoint) {
+            array.storeValue(startPoint, endPoint, 1);
+            array.storeBestCut(startPoint, endPoint, startPoint);
+            if (array.get(startPoint) > array.get(endPoint)) {
+                array.storeBestCutString(startPoint, endPoint, array.get(endPoint) + ","
+                        + array.get(startPoint));
+            } else {
+                array.storeBestCutString(startPoint, endPoint, array.get(startPoint) + ","
+                        + array.get(endPoint));
+            }
+            return 1;
+        }
+
+        int storeBest = -1;
+        int currentBest = 0, bestCut = 0;
+
+        for (int cutPoint = startPoint; cutPoint < endPoint; cutPoint++) {
+            currentBest = recurseAux(array, startPoint, cutPoint) + recurseAux(array, cutPoint + 1, endPoint);
+
+            CombTest array1 = new CombTest(), array2 = new CombTest();
+
+            for (int i = startPoint; i <= cutPoint; i++) {
+                array1.addNumber(array.get(i));
+            }
+            for (int i = cutPoint + 1; i <= endPoint; i++) {
+                array2.addNumber(array.get(i));
+            }
+
+            currentBest += combineGroup(array1, array2, startPoint, endPoint);
+
+            if (storeBest == -1) {
+                bestCut = cutPoint;
+                storeBest = currentBest;
+            } else if (currentBest < storeBest) {
+                bestCut = cutPoint;
+                storeBest = currentBest;
+            }
+        }
+
+        array.storeValue(startPoint, endPoint, storeBest);
+        array.storeBestCut(startPoint, endPoint, bestCut);
+        array.storeBestCutString(startPoint, endPoint, combineInstruction(array, startPoint, endPoint));
+
+        return storeBest;
+    }
+
+    public static String combineInstruction(NumberGroup array, int startPoint, int endPoint) {
+        String toReturn = "";
+        ArrayList<Integer> copy = new ArrayList<Integer>();
+
+        for (int i = startPoint; i <= endPoint; i++) {
+            copy.add(array.get(i));
+        }
+
+        Collections.sort(copy);
+
+        for (int i = 0; i < copy.size(); i++) {
+            if (i + 1 != copy.size()) {
+                toReturn += copy.get(i) + ",";
+            } else {
+                toReturn += copy.get(i);
+            }
+        }
+
+        return toReturn;
+    }
+
+    public static int combineGroup(CombTest array1, CombTest array2, int startPoint, int endPoint) {
+        if (array1.size() == 1 && array2.size() == 1) {
+            return 1;
+        }
+
+        int numberOfSmallestConsec = 0;
+        int array1Highest = array1.getHighestNum(), array2Highest = array2.getHighestNum();
+        int array1Lowest = array1.getLowestNum(), array2Lowest = array2.getLowestNum();
+
+        if (array1Highest < array2Lowest) {
+            numberOfSmallestConsec = array1.size();
+        } else if (array2Highest < array1Lowest) {
+            numberOfSmallestConsec = array2.size();
+        } else if (array1Lowest < array2Lowest) {
+            for (int i = 0; i < array1.size(); i++) {
+                if (array1.getNumber(i) < array2Lowest) {
+                    numberOfSmallestConsec++;
+                } else {
+                    break;
+                }
+            }
+        } else {
+            for (int i = 0; i < array2.size(); i++) {
+                if (array2.getNumber(i) < array1Lowest) {
+                    numberOfSmallestConsec++;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        int combinationTime = (endPoint - startPoint) - numberOfSmallestConsec;
+
+        return combinationTime + 1;
+    }
+
+}
