@@ -1,0 +1,218 @@
+package cecs328assi2;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+
+/**
+ *
+ * @author Daniel Kim
+ */
+public class NumberGroup {
+
+    private ArrayList<Integer> listOfNumbers;
+    private ArrayList<String> instructionSet;
+    private ArrayList<Integer> startPoints, endPoints;
+    private String answer, unsolvedString, leftSolved, rightUnsolved;
+    private int[][] storeCase;
+    private HashMap<String, Integer> storeBestCaseCut;
+    private HashMap<String, String> storeBestCaseString, uneditedBestCut;
+    private int size;
+
+    public NumberGroup() {
+        listOfNumbers = new ArrayList<Integer>();
+        storeBestCaseCut = new HashMap<String, Integer>();
+        storeBestCaseString = new HashMap<String, String>();
+        uneditedBestCut = new HashMap<String, String>();
+        instructionSet = new ArrayList<String>();
+        startPoints = new ArrayList<Integer>();
+        endPoints = new ArrayList<Integer>();
+        answer = "";
+        unsolvedString = "";
+        leftSolved = "";
+        rightUnsolved = "";
+        size = 0;
+    }
+
+    public void addStartPoints(int number) {
+        startPoints.add(number);
+    }
+
+    public int removeLast() {
+        int toReturn = listOfNumbers.remove(size - 1);
+        size--;
+        return toReturn;
+    }
+
+    public boolean isEmpty() {
+        return listOfNumbers.isEmpty();
+    }
+
+    public void addEndPoints(int number) {
+        endPoints.add(number);
+    }
+
+    public int getStartEndPointSize() {
+        return endPoints.size();
+    }
+
+    public int getEndPoint(int index) {
+        return endPoints.get(index);
+    }
+
+    public int getStartPoint(int index) {
+        return startPoints.get(index);
+    }
+
+    public void initializeGroupStor() {
+        storeCase = new int[size][size];
+
+        for (int i = 0; i < size; i++) {
+            Arrays.fill(storeCase[i], -1);
+        }
+    }
+
+    public void initializeAnswer() {
+        for (int i = 0; i < size; i++) {
+            if (i + 1 != size) {
+                answer += (i + 1) + ",";
+                unsolvedString += listOfNumbers.get(i) + " ";
+            }
+            else {
+                answer += (i + 1);
+                unsolvedString += listOfNumbers.get(i);
+            }
+        }
+
+    }
+
+    public int get(int index) {
+        return listOfNumbers.get(index);
+    }
+
+    public void addLeftSolved(String add) {
+        if (leftSolved.isEmpty()) {
+            leftSolved += add;
+        }
+        else {
+            leftSolved += " " + add;
+        }
+    }
+
+    public void addRightUnsolved(String add) {
+        if (rightUnsolved.isEmpty()) {
+            rightUnsolved += add;
+        }
+        else {
+            rightUnsolved += " " + add;
+        }
+    }
+
+    public int size() {
+        return size;
+    }
+
+    public void storeValue(int start, int end, int value) {
+        storeCase[start][end] = value;
+    }
+
+    public void storeBestCut(int start, int end, int cut) {
+        String concatValue = start + "" + end;
+        storeBestCaseCut.put(concatValue, cut);
+    }
+
+    public void storeBestCutString(int start, int end, String comb1) {
+        uneditedBestCut.put(start + "" + end, comb1);
+
+        String leftSide = "";
+        for (int i = 0; i < start; i++) {
+            leftSide += listOfNumbers.get(i) + " ";
+        }
+
+        if (start == end || start + 1 == end) {
+            this.storeBestCaseString.put(start + "" + end, leftSide + comb1);
+        }
+        else {
+            this.storeBestCaseString.put(start + "" + end, leftSide + comb1);
+        }
+    }
+
+    public String getUneditedBestCut(int start, int end) {
+        return this.uneditedBestCut.get(start + "" + end);
+    }
+
+    public String getBestCaseString(int start, int end) {
+        return this.storeBestCaseString.get(start + "" + end);
+    }
+
+    public int getBestCut(int start, int end) {
+        String concatValue = start + "" + end;
+        return storeBestCaseCut.get(concatValue);
+    }
+
+    public int checkStoredValue(int start, int end) {
+        return storeCase[start][end];
+    }
+
+    public void addNumber(int number) {
+        listOfNumbers.add(number);
+        size++;
+    }
+
+    public void addToBeggining(int number) {
+        listOfNumbers.add(0, number);
+        size++;
+    }
+
+    public boolean contains(int number) {
+        return listOfNumbers.contains(number);
+    }
+
+    public String printAnswer() {
+        return answer;
+    }
+
+    public String printUnsolved() {
+        return unsolvedString;
+    }
+
+    public String getLeftString() {
+        if (!leftSolved.isEmpty()) {
+            return leftSolved + " ";
+        }
+        return leftSolved;
+    }
+
+    public String getRightString() {
+        return rightUnsolved;
+    }
+
+    public void addInstruction(String add) {
+        if (this.getRightString().isEmpty()) {
+            instructionSet.add(this.getLeftString() + add + this.getRightString());
+            return;
+        }
+        instructionSet.add(this.getLeftString() + add + this.getRightString() + " ");
+    }
+
+    public void printInstruction(PrintWriter output) {
+        for (int i = 0; i < instructionSet.size(); i++) {
+            output.println(instructionSet.get(i));
+        }
+    }
+
+    public void printInstruction() {
+
+        for (int i = 0; i < instructionSet.size(); i++) {
+            System.out.println(instructionSet.get(i));
+        }
+    }
+
+    @Override
+    public String toString() {
+        return unsolvedString;
+    }
+
+}
