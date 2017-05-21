@@ -20,6 +20,7 @@ combining group [1, 2, 6] with the group [4] is two, since you have to open the
 dolls with sizes 6 and 4. When combining group [1, 2, 5] with the group [3, 4],
 you need to perform three openings.
 
+
 Your goal will be to write a program to print out instructions for the reassembly
 process so as to minimize the number of openings and closings that
 need to be done. If it is not possible to reassemble the dolls at all, given the
