@@ -1,6 +1,10 @@
 # SoloAlgorithmsProject1
-This project demonstrates my knowledge and mastery in Dynamic Programming and Recursion
+This project demonstrates my knowledge and mastery in Dynamic Programming and Recursion  
+
 Honors Algorithms Course - Russian Doll Reassembly 
+This is a substantially harder version than the one given out at the National Progamming Team Competition.  
+Students are not allowed to share their work WITH EACH OTHER. All work is to be done alone.  
+California State University - Long Beach  
 
 There are n dolls in the row, each with an integer size. You need to reassemble the matryoshka  
 sets, knowing neither the number of sets nor the number of dolls in each set.  
